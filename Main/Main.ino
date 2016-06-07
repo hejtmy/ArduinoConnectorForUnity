@@ -170,4 +170,3 @@ void CancelPulse(){
   pulsing = false; // no fuctionality yet
   digitalWrite(pulsePin, LOW);
 }
-

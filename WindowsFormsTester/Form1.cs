@@ -51,7 +51,7 @@ namespace WindowsFormsApplication1
         {
             label2.Text = "NO";
             arduino.DataIncomming -= PrintLine;
-            arduino.Disconnect();
+            arduino.Reset();
         }
 
         private void button3_Click(object sender, EventArgs e)

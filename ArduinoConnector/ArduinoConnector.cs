@@ -74,10 +74,10 @@ namespace ArduinoConnector
         /// <summary>
         /// Clears the connection and possible clutter and bad settings that might hang from previous connections
         /// </summary>
-        public void Restart()
+        public void Reset()
         {
             ResetArduinoConnection();
-            Connect();
+            Disconnect();
         }
         public void Blink()
         {
@@ -199,7 +199,6 @@ namespace ArduinoConnector
             if (IsOpen())
             {
                 SendMessage("RESTART");
-                Disconnect();
                 return;
             }
             SerialPort port;

@@ -30,6 +30,7 @@ namespace ArduinoConnector
             _arduinoType = type;
         }
         #region PUBLIC API
+        #region Connecting
         /// <summary>
         /// Loops through open serial ports and tries to connect to arduino sketch
         /// </summary>
@@ -44,11 +45,6 @@ namespace ArduinoConnector
                 _port.DataReceived += SendIncommingData;
             }
             return IsOpen();
-        }
-        public string ReadMessage()
-        {
-            if (IsOpen()) return _port.ReadLine();
-            return null;
         }
         public bool IsOpen()
         {
@@ -72,17 +68,52 @@ namespace ArduinoConnector
             return _port;
         }
         /// <summary>
-        /// Clears the connection and possible clutter and bad settings that might hang from previous connections
+        /// Clears the connection and possible clutter and bad settings that might hang from previous connections.
+        /// 
         /// </summary>
-        public void Reset()
+        /// <param name="reconnect">If true, tries to reconnect after reseting. Defults to false.</param>
+        public void Reset(bool reconnect = false)
         {
             ResetArduinoConnection();
             Disconnect();
+            if (reconnect) Connect();
         }
+        #endregion
+        #region Controlling arduino
+        /// <summary>
+        /// Reads in the serial message from arduino
+        /// </summary>
+        /// <returns></returns>
+        public string ReadMessage()
+        {
+            if (IsOpen()) return _port.ReadLine();
+            return null;
+        }
+        /// <summary>
+        /// Sets the led to just send 100 ms pulse
+        /// </summary>
         public void Blink()
         {
             SendMessage("BLINK");
         }
+        /// <summary>
+        /// Sets the pulsing pin to high voltage
+        /// </summary>
+        public void StartPulse()
+        {
+            SendPuls(true);
+        }
+        /// <summary>
+        /// Sets the pulsing pin to low voltage
+        /// </summary>
+        public void StopPulse()
+        {
+            SendPuls(false);
+        }
+        /// <summary>
+        /// Sets the Pulsing pin to high voltage
+        /// </summary>
+        /// <param name="bo">Defines whether to sendp pulse up or cancel pulse</param>
         public void SendPuls(bool bo)
         {
             if (IsOpen())
@@ -102,6 +133,7 @@ namespace ArduinoConnector
         {
             if (IsOpen()) SendMessage(message, _port);
         }
+        #endregion
         #endregion
         #region PRIVATE
         #region Establishing connection

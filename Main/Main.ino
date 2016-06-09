@@ -1,5 +1,5 @@
 /*
-  Name:		Sketch1.ino
+  Name:		Main.ino
   Created:	3/13/2016 6:43:19 PM
   Author:	hejtmy
 */
@@ -16,7 +16,7 @@ int speed = 20;
 
 //pin setup
 int pulsePin = 13;
-int photoresistorPin = 0;
+int photoresistorPin = A0;
 
 char* buttonColours[numberOfButtons] = {"RED","BLUE","YELLOW","GREEN"};
 int buttonPins[numberOfButtons] = {7, 6, 5, 4};
@@ -34,10 +34,12 @@ void setup() {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB
   }
+  pinMode(pulsePin, OUTPUT);
   //initialise buttons
   for(int i = 0; i < numberOfButtons;i++){
     pinMode(buttonPins[i], INPUT_PULLUP);
   }
+
 }
 
 // the loop function runs over and over again until power down or reset
@@ -129,6 +131,7 @@ void Blink(){
 }
 void StartPhotoresistor(){
   photoresistorUse = true;
+  pinMode(photoresistorPin, INPUT);
   CalibratePhotoresistor();
 }
 void StopPhotoresistor(){

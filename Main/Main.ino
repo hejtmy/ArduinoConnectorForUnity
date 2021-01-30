@@ -3,7 +3,7 @@
   Created:	3/13/2016 6:43:19 PM
   Author:	hejtmy
 */
-#include <Keyboard.h>
+//#include <Keyboard.h>
 #define numberOfButtons 4
 
 String serialInput;
@@ -58,6 +58,7 @@ void loop() {
     ButtonsAction();
   }
 }
+
 void LettingKnow() {
   float time = millis();
   while (true) {
@@ -74,14 +75,17 @@ void LettingKnow() {
     delay(speed);
   }
 }
+
 void Connect(){
-  Keyboard.begin();
+  //Keyboard.begin();
   connected = true;
 }
+
 void Disconnect(){
   connected = false;
-  Keyboard.end();
+  //Keyboard.end();
 }
+
 void Restart(){
   Disconnect();
 }
@@ -119,25 +123,31 @@ void ListenForOrders() {
     }
   }
 }
+
 void SendDone(){
   Serial.println("DONE");
 }
+
 void Blink(){
   digitalWrite(13, HIGH);
   delay(100);
   digitalWrite(13, LOW);
 }
+
 void StartPhotoresistor(){
   photoresistorUse = true;
   CalibratePhotoresistor();
 }
+
 void StopPhotoresistor(){
   photoresistorUse = false;
 }
+
 void CalibratePhotoresistor(){
   //should do differently?
   photoresistorThreshold = analogRead(photoresistorPin);
 }
+
 void PhotoresistorAction(){
   if(digitalRead(7) == LOW){
     Serial.println(analogRead(photoresistorPin));
@@ -152,18 +162,21 @@ void PhotoresistorAction(){
     }
   }
 }
+
 void ButtonsAction(){
   for(int i=0; i < numberOfButtons; i++){
     if(digitalRead(buttonPins[i]) == LOW){
-      Keyboard.write(buttonKeys[i]);
+      //Keyboard.write(buttonKeys[i]);
       Serial.println(buttonColours[i]);
     }
   }
 }
+
 void StartPulse(){
   pulsing = true; // no fuctionality yet
   digitalWrite(pulsePin, HIGH);
 }
+
 void CancelPulse(){
   pulsing = false; // no fuctionality yet
   digitalWrite(pulsePin, LOW);

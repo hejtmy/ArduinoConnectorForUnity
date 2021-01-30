@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 using System.Timers;
+using ArduinoConnector;
 
 namespace ConsoleApplication1
 {
@@ -10,9 +11,9 @@ namespace ConsoleApplication1
 
         static void Main(string[] args)
         {
-            Setup();
+            var arduino = Setup2();
             Timer myTimer = new Timer();
-            myTimer.Elapsed += new ElapsedEventHandler(ReadData);
+            myTimer.Elapsed += delegate { Blink(arduino); };
             myTimer.Interval = 1000;
             myTimer.Enabled = true;
             while (true)
@@ -20,15 +21,14 @@ namespace ConsoleApplication1
             }
         }
 
-        private static void ReadData(object sender, EventArgs e)
+        private static void Blink(Arduino arduino)
         {
-            string data = port.ReadLine();
-            Console.WriteLine(data);
-            Console.WriteLine(data.Contains("ARDUINO"));
+            arduino.Blink();
         }
+
         private static void Setup()
         {
-            port = new SerialPort("COM5", 9600);
+            port = new SerialPort("COM3", 9600);
             port.DtrEnable = true;
             port.RtsEnable = false;
             if (!port.IsOpen)
@@ -36,13 +36,21 @@ namespace ConsoleApplication1
                 try
                 {
                     port.Open();
-                    port.WriteLine("WHO");
+                    port.WriteLine("WHO!");
                 }
                 catch
                 {
                     Console.WriteLine("There was an error. Please make sure that the correct port was selected, and the device, plugged in.");
                 }
             }
+        }
+
+        private static Arduino Setup2()
+        {
+            var arduino = new Arduino(ArduinoType.Generic);
+            var connected = arduino.Connect();
+            if(connected) Console.WriteLine("Connected");
+            return arduino;
         }
     }
 }

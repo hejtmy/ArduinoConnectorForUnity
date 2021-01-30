@@ -4,7 +4,7 @@ using System.IO.Ports;
 
 namespace ArduinoConnector
 {
-    public enum ArduinoType {Leonardo, Uno, Generic}
+    public enum ArduinoType {Leonardo, Uno, Generic, Nano}
     public enum ArduinoEvent {DONE, RED, GREEN, YELLOW, BLUE}
 
     public class Arduino
@@ -15,7 +15,7 @@ namespace ArduinoConnector
         public Dictionary<string, ArduinoEvent> ArduinoEventDictionary = new Dictionary<string, ArduinoEvent>
         {
             {"BLUE",ArduinoEvent.BLUE},
-            { "GREEN",ArduinoEvent.GREEN},
+            {"GREEN",ArduinoEvent.GREEN},
             {"RED", ArduinoEvent.RED},
             {"YELLOW", ArduinoEvent.YELLOW},
             {"DONE", ArduinoEvent.DONE}
@@ -39,29 +39,24 @@ namespace ArduinoConnector
         {
             if (IsOpen()) return true;
             _port = TryPorts();
-            if (IsOpen())
-            {
-                _comPort = _port.PortName;
-                _port.DataReceived += SendIncommingData;
-            }
+            if (!IsOpen()) return IsOpen();
+            _comPort = _port.PortName;
+            _port.DataReceived += SendIncommingData;
             return IsOpen();
         }
         public bool IsOpen()
         {
-            if (_port != null && _port.IsOpen) return true;
-            return false;
+            return _port != null && _port.IsOpen;
         }
         /// <summary>
         /// Closes the port while maintaining class settings
         /// </summary>
         public void Disconnect()
         {
-            if (IsOpen())
-            {
-                _port.DataReceived -= SendIncommingData;
-                SendMessage("DISCONNECT");
-                _port.Close();
-            }   
+            if (!IsOpen()) return;
+            _port.DataReceived -= SendIncommingData;
+            SendMessage("DISCONNECT");
+            _port.Close();
         }
         public SerialPort GetSerialPort()
         {
@@ -183,11 +178,18 @@ namespace ArduinoConnector
         private SerialPort SetupConnection(string portName)
         {
             SerialPort port = new SerialPort(portName, 9600);
-            if (_arduinoType == ArduinoType.Leonardo)
+            switch (_arduinoType)
             {
-                port.DtrEnable = true;
-                port.RtsEnable = true;
+                case ArduinoType.Leonardo:
+                    port.DtrEnable = true;
+                    port.RtsEnable = true;
+                    break;
+                case ArduinoType.Nano:
+                    port.DtrEnable = true;
+                    port.RtsEnable = false;
+                    break;
             }
+
             return port;
         }
         /// <summary>
@@ -201,7 +203,7 @@ namespace ArduinoConnector
             port.WriteLine("WHO!");
             try
             {
-                port.ReadTimeout = 50;
+                port.ReadTimeout = 100;
                 info = port.ReadLine();
             }
             catch (TimeoutException)
